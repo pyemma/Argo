@@ -1,9 +1,8 @@
 import torch
-from torch.utils.data import DataLoader
 
-from configs.model import LARGE_TRANSACT_CONFIG
+from configs.model import LARGE_TRANSACT_CONFIG, OUTPUT_MODEL_PATH
 from data.dataset import prepare_movie_len_transact_dataset, DatasetType
-from model.transact import TransActModule, TransAct
+from model.transact import TransAct
 from trainer.simple_trainer import SimpleTrainer
 
 
@@ -17,3 +16,5 @@ if __name__ == "__main__":
 
     trainer = SimpleTrainer(model=model, train_dataset=train_dataset, eval_dataset=eval_dataset)
     trainer.train(num_epochs=2)
+
+    trainer.save("transact-movie-len-full", movie_index=None, path=OUTPUT_MODEL_PATH)

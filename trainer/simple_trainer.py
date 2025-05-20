@@ -20,7 +20,7 @@ class SimpleTrainer:
         self.train_data_loader = DataLoader(dataset=train_dataset, batch_size=32)
         self.eval_data_loader = DataLoader(dataset=eval_dataset, batch_size=32)
 
-        self.device = torch.device("mps" if torch.cuda.is_available() else "cpu")
+        self.device = torch.device("mps" if torch.mps.is_available() else "cpu")
         self.model.to(self.device)
 
         # loss function, for now we use the default BCE

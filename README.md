@@ -9,16 +9,17 @@ This is a playground to re-implement model architectures from industry/academic 
 ### Repo structure
 
 - data: functions for dataset management, such as downloading public dataset, cache management, etc
+- feature: functions for featuer engeering, right now primarily read data from benchmark and use Pandas to do certain feature engineer
 - model: model code implementation
 - trainer: simple wrapper around train/val/eval loop
-- server: simple inference stack for recommendation system
+- server: simple inference stack for recommendation system, including retrieval engine, feature server, model manager and inference engine
 
 ### How to run locally
 
 1. install the dependency `pip install -r requirements.txt`, `pip install -e .`
 2. run `python main.py` to train the model with current env config.
 3. run `python server/inference_engine.py` to start the inference server, it would listen on 8000 port
-4. run `bash scripts/server_request.sh` to send a dummy request
+4. run `bash scripts/server_request.sh` to send a dummy request (there is one for DIN and one for TransAct as of now, will parameterized the request in the future)
 
 ### Papers
 
@@ -32,7 +33,7 @@ This is a playground to re-implement model architectures from industry/academic 
 ### Road Map
 
 - [x] :white_check_mark: Deep Interest Network E2E training & inference example, MovieLen Small
-- [ ] TransAct ~training~ & inference example, MovieLen Small
+- [x] :white_check_mark: TransAct training & inference example, MovieLen Large
 - [ ] MovieLen item ~embedding generation~, collaborative filtering, ~two-towers~, LLM
 - [ ] HSTU training & inference example, MoiveLen Small
 - [ ] Kuaishou Dataset

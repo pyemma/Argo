@@ -97,4 +97,4 @@ LARGE_TRANSACT_CONFIG = TransActModelConfig(
 )
 
 # Load output model path from environment variable with a default fallback
-OUTPUT_MODEL_PATH = os.getenv("OUTPUT_MODEL_PATH", "./data/tmp")
+OUTPUT_MODEL_PATH = os.getenv("OUTPUT_MODEL_PATH", "./artifacts")

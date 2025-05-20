@@ -7,6 +7,7 @@ from torch.utils.data import Dataset, DataLoader
 
 from data.dataset_manager import DatasetType, dataset_manager
 from feature.movie_len_features import MovieLenFeatureStore
+from feature.utils import padding
 
 
 class MovieLenDataset(Dataset):
@@ -224,20 +225,12 @@ class MovieLenTransActDataset(Dataset):
         # for genre feature, it is essentially a var-length feature but for input we need to have fix length as of now,
         # here we padding 0 for list
         # TODO, support var-length sparse ids
-        def padding(x):
-            """
-            padding 0 to the sequence and bump the original values with 1 to compensate for the 0 padding
-            """
-            if len(x) >= max_num_genres:
-                return [elem + 1 for elem in x[:max_num_genres]]
-            return x + [0] * (max_num_genres - len(x))
-
         user_viewed_genres = feature_store.user_viewed_genres[["userId", "sorted_genres"]].copy()
-        user_viewed_genres["sorted_genres"] = user_viewed_genres["sorted_genres"].apply(lambda x: padding(x))
+        user_viewed_genres["sorted_genres"] = user_viewed_genres["sorted_genres"].apply(lambda x: padding(x, max_num_genres))
 
         # retrieve *document* side feature
         candidate = candidate.merge(feature_store.movie_genres, how="left", left_on="candidate_item", right_on="movieId")
-        candidate["genres"] = candidate["genres"].apply(lambda x: padding(x))
+        candidate["genres"] = candidate["genres"].apply(lambda x: padding(x, max_num_genres))
 
         # merge all features together as a single dataframe
         df = (
@@ -283,8 +276,8 @@ class MovieLenTransActDataset(Dataset):
         }, torch.tensor(self.data.iloc[index]["label"], dtype=torch.float)
 
 
-def prepare_movie_len_transact_dataset(embedding_store, dataset_type, eval_ratio: float = 0.1):
-    data, unique_ids = MovieLenTransActDataset.prepare_data(history_seq_length=15, dataset_type=dataset_type)
+def prepare_movie_len_transact_dataset(embedding_store, dataset_type, history_seq_length, eval_ratio: float = 0.1):
+    data, unique_ids = MovieLenTransActDataset.prepare_data(history_seq_length=history_seq_length, dataset_type=dataset_type)
 
     eval_data = data.sample(frac=eval_ratio)
     train_data = data.drop(index=eval_data.index)
@@ -330,7 +323,7 @@ if __name__ == "__main__":
     # print("MovieLenRatingDataset batch shape test passed...")
 
     embedding_store = torch.ones((300000, 64))
-    train_dataset, eval_dataset = prepare_movie_len_transact_dataset(embedding_store)
+    train_dataset, eval_dataset = prepare_movie_len_transact_dataset(embedding_store=embedding_store, dataset_type=DatasetType.MOVIE_LENS_LATEST_SMALL, history_seq_length=15)
 
     loader = DataLoader(train_dataset, batch_size=5)
     it = iter(loader)
