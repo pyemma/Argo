@@ -65,7 +65,7 @@ class EmbeddingTrainer:
                 item_ids = item_ids.to(self.device)
                 ratings = ratings.to(self.device)
 
-                predictions = self.model(user_ids, item_ids)
+                predictions = self.model(user_ids, item_ids).squeeze(1)
                 loss = self.loss(predictions, ratings)
 
                 total_loss += loss.item()

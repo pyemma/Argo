@@ -12,7 +12,9 @@ if __name__ == "__main__":
     embedding_store = torch.load(DEFAULT_MOVIE_LEN_EMBEDDING_PATH, weights_only=False)
 
     model = TransAct(LARGE_TRANSACT_CONFIG)
-    train_dataset, eval_dataset = prepare_movie_len_transact_dataset(embedding_store=embedding_store, dataset_type=DatasetType.MOVIE_LENS_LATEST_FULL)
+    train_dataset, eval_dataset = prepare_movie_len_transact_dataset(embedding_store=embedding_store, 
+                                                                     dataset_type=DatasetType.MOVIE_LENS_LATEST_FULL,
+                                                                     history_seq_length=15)
 
     trainer = SimpleTrainer(model=model, train_dataset=train_dataset, eval_dataset=eval_dataset)
     trainer.train(num_epochs=2)
