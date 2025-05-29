@@ -9,8 +9,8 @@ class TwoTowerModel(nn.Module):
         # TODO: move to model config
         # here we use user/item to different the 2 towers, which is a common convention in industry
         self.embedding_dim = 32
-        self.user_cardinality = 3000000
-        self.item_cardinality = 3000000
+        self.user_cardinality = 300000
+        self.item_cardinality = 350000
 
         # create embedding lookup table
         self.user_embedding = nn.Embedding(num_embeddings=self.user_cardinality, embedding_dim=self.embedding_dim)

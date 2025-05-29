@@ -18,8 +18,9 @@ This is a playground to re-implement model architectures from industry/academic 
 
 1. install the dependency `pip install -r requirements.txt`, `pip install -e .`
 2. run `python main.py` to train the model with current env config.
-3. run `python server/inference_engine.py` to start the inference server, it would listen on 8000 port
-4. run `bash scripts/server_request.sh` to send a dummy request (there is one for DIN and one for TransAct as of now, will parameterized the request in the future)
+3. run `python -m server/ebr_server.py` to start the grpc server for embedding based retrieval, it would listen on port 50051 by default
+4. run `python server/inference_engine.py` to start the inference server, it would listen on 8000 port
+5. run `bash scripts/server_request.sh` to send a dummy request (there is one for DIN and one for TransAct as of now, will parameterized the request in the future)
 
 ### Papers
 
@@ -48,7 +49,7 @@ Data & Feature Engineering
       
 Infra
 
-- [ ] Embedding Based Retrieval (EBR): DuckDB, FAISS
+- [ ] Embedding Based Retrieval (EBR): DuckDB, ~FAISS~
 - [ ] Nearline item embedding update
 - [ ] Feature store integration: FEAST
 - [ ] Feature logging & training data generation pipeline

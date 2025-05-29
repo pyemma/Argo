@@ -23,4 +23,4 @@ if __name__ == "__main__":
             best_embeddings = trainer.export()
             print(f"On trial {trial}, found the best loss {loss:.4f}, current best {best_embeddings_loss:.4f}...")
 
-    torch.save(best_embeddings, "artifacts/movie_embeddings.pt")
+    torch.save(best_embeddings, "artifacts/movie_embeddings_v2.pt")

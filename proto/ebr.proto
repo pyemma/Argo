@@ -1,0 +1,24 @@
+// ebr.proto
+syntax = "proto3";
+
+package ebr;
+
+service EBRService {
+    rpc Search (SearchRequest) returns (SearchResponse) {}
+}
+
+message SearchRequest {
+    repeated int32 ids = 1;
+    int32 k = 2;
+}
+
+message SearchResponse {
+    repeated SearchResult results = 1;
+}
+
+message SearchResult {
+    int32 id = 1;
+    float score = 2;
+    int32 source_id = 3;
+}
+

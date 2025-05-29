@@ -10,7 +10,7 @@ from pydantic import BaseModel
 
 from data.dataset import DatasetType
 from server.model_manager import model_manager, ModelType
-from server.retrieval_engine import RetrievalEngine
+from server.retrieval_engine import RetrievalEngine, RetrievalEngineConfig
 from server.feature_server import FeatureServer, FeatureName, FeatureServerConfig
 
 
@@ -24,9 +24,12 @@ app = FastAPI()
 # for now we hard code the model to be used for inference
 
 # initialize candidate generation and feature store
-retrieval_engine = RetrievalEngine()
 feature_server = FeatureServer(
-    FeatureServerConfig(movie_len_history_seq_length=15, movie_len_dataset_type=DatasetType.MOVIE_LENS_LATEST_SMALL, embedding_store_path="artifacts/movie_embeddings.pt")
+    FeatureServerConfig(movie_len_history_seq_length=15, movie_len_dataset_type=DatasetType.MOVIE_LENS_LATEST_FULL, embedding_store_path="artifacts/movie_embeddings.pt")
+)
+retrieval_engine = RetrievalEngine(
+    RetrievalEngineConfig(enable_embedding_retrieval_engine=True, num_candidates=10),
+    feature_server,
 )
 
 
@@ -34,8 +37,9 @@ feature_server = FeatureServer(
 async def recommend(request: RecommendationRequest):
     try:
         # fetch candidates
-        candidates = retrieval_engine.generate_candidates()
         user_id = request.user_id
+        candidates = retrieval_engine.generate_candidates(user_id=user_id)
+        candidate_ids = [candidate.id for candidate in candidates]
 
         model = model_manager.get_model(ModelType.DIN_SMALL)
         # there is one implementation issue in the current DIN that the device need to be passed into the module
@@ -49,10 +53,10 @@ async def recommend(request: RecommendationRequest):
         # model inference
         # we use a simple approach to predict all candidates within a single batch, there could be
         # OOM issue, but in the current movie len small dataset, this should not cause issue on modern laptop
-        num_candidates = len(candidates)
+        num_candidates = len(candidate_ids)
         data = {
             "user_id": torch.tensor([[user_id]]).expand(num_candidates, -1),  # B x 1, use expand is memory efficient
-            "item_id": torch.tensor(candidates).unsqueeze(1),  # B x 1
+            "item_id": torch.tensor(candidate_ids).unsqueeze(1),  # B x 1
             "user_history_behavior": torch.tensor(user_sequence_feature).expand(num_candidates, -1),  # B x seq_len
             "user_history_length": torch.tensor([8]).expand(num_candidates, -1),  # B x 1
             "dense_features": torch.ones([8]).expand(num_candidates, -1),  # B x num_dense
@@ -74,8 +78,9 @@ async def recommend(request: RecommendationRequest):
 @app.post("/recommend_transact/")
 async def recommend_transact(request: RecommendationRequest):
     # fetch candidates
-    candidates = retrieval_engine.generate_candidates()
     user_id = request.user_id
+    candidates = retrieval_engine.generate_candidates(user_id=user_id)
+    candidate_ids = [candidate.id for candidate in candidates]
 
     model = model_manager.get_model(ModelType.TRANSACT_FULL)
     device = model_manager.device
@@ -87,16 +92,16 @@ async def recommend_transact(request: RecommendationRequest):
     # this step is slightly different in training, in the sense that user side feature
     # is shared across all candidate and this might offer an opportunity for us to
     # reduce the memory usage
-    batch_size = 256
-    num_batch = len(candidates) // batch_size
+    batch_size = 8
+    num_batch = len(candidate_ids) // batch_size
     predictions = []
     # for simplicity, this is done in a for loop
     # TODO: optimize with batch mode
     for i in range(num_batch):
         candidate_genres, candidate_embeddings = [], []
         start = i * batch_size
-        end = min((i + 1) * batch_size, len(candidates))
-        for c in candidates[start:end]:
+        end = min((i + 1) * batch_size, len(candidate_ids))
+        for c in candidate_ids[start:end]:
             candidate_feature = feature_server.extract_item_feature(item_id=c)
             candidate_genres.append(candidate_feature[FeatureName.MOVIE_GENRES])
             candidate_embeddings.append(candidate_feature[FeatureName.ITEM_EMBEDDING])
@@ -121,7 +126,7 @@ async def recommend_transact(request: RecommendationRequest):
     top_k_indices = sorted_indices[:10].tolist()
 
     # return topk
-    return {"recommendations": [{"movie_id": idx, "scores": score, "rank": i} for i, (idx, score) in enumerate(zip(top_k_indices, top_k_scores))]}
+    return {"recommendations": [{"movie_id": candidate_ids[idx], "scores": score, "rank": i} for i, (idx, score) in enumerate(zip(top_k_indices, top_k_scores))]}
 
 
 if __name__ == "__main__":

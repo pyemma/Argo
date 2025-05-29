@@ -74,6 +74,7 @@ class FeatureServer:
         self.store[FeatureName.NUM_USER_VIEWED_MOVIES] = feature_store.user_num_viewed_movies.set_index("userId")
 
         self.embedding_store = torch.load(config.embedding_store_path, weights_only=False)
+        self.unique_ids = feature_store.unique_ids
 
     def generate_feature(self, feature_name, user_id):
         return self.store.get(feature_name).get(user_id)
@@ -104,14 +105,34 @@ class FeatureServer:
         feature_dict[FeatureName.ITEM_EMBEDDING] = self.embedding_store[item_id]
         return feature_dict
 
+    def extract_user_interaction_sequence(self, user_id: int, ratings: float):
+        """
+        Only extract the user item sequence with rating greater than certain threshold
+        """
+        item_sequence = self.store[FeatureName.ITEM_SEQUENCE].loc[user_id].iloc[0]
+        action_sequence = self.store[FeatureName.ACTION_SEQUENCE].loc[user_id].iloc[0]
+
+        # the action sequence is encoded as categorical feature right now, we need to use the
+        # unique ids to check the category we need
+        whitelist = set()
+        for idx, i in enumerate(self.unique_ids):
+            if i >= ratings:
+                whitelist.add(idx)
+
+        result = [i for (i, a) in zip(item_sequence, action_sequence) if a in whitelist]
+        return result
+
 
 if __name__ == "__main__":
     server = FeatureServer(
         FeatureServerConfig(movie_len_history_seq_length=15, movie_len_dataset_type=DatasetType.MOVIE_LENS_LATEST_SMALL, embedding_store_path="artifacts/movie_embeddings.pt")
     )
 
-    user_feature = server.extract_user_feature(user_id=1)
-    item_feature = server.extract_item_feature(item_id=1)
+    # user_feature = server.extract_user_feature(user_id=1)
+    # item_feature = server.extract_item_feature(item_id=1)
 
-    print(user_feature)
-    print(item_feature)
+    # print(user_feature)
+    # print(item_feature)
+
+    result = server.extract_user_interaction_sequence(user_id=2, ratings=3.0)
+    print(result)
