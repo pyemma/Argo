@@ -1,3 +1,4 @@
+cinemagoer
 duckdb
 faiss-cpu
 fastapi
@@ -5,6 +6,7 @@ grpcio
 grpcio-tools
 pandas
 python-dotenv
+ray
 requests
 scikit-learn
 torch
