@@ -52,13 +52,13 @@ Modeling
 - [x] :white_check_mark: Deep Interest Network E2E training & inference example, MovieLen Small
 - [x] :white_check_mark: TransAct training & inference example, MovieLen Large
 - [x] :white_check_mark: MovieLen item embedding generation, collaborative filtering, two-towers, LLM ([QWen3-embedding](https://huggingface.co/Qwen/Qwen3-Embedding-0.6B) is out)
-- [ ] HSTU training & inference example, MoiveLen Small
+- [ ] 🚧 HSTU training & inference example, MoiveLen Small
 - [x] :white_check_mark: RQ-VAE
 - [ ] Generative Retrieval via various strategies: NTP, MTP with semtanic ids, token represention with ANN
 
 Data & Feature Engineering
 
-- [ ] 🚧 Kuaishou Dataset: https://kuairand.com/
+- [x] :white_check_mark: Kuaishou Dataset: https://kuairand.com/
 - [ ] Ray integration (DPP reader + trainer arch)
 - [ ] Daft, Polars exploartion
       
@@ -68,7 +68,7 @@ Infra
 - [ ] Nearline item embedding update
 - [ ] Feature store integration: FEAST
 - [ ] Feature logging & training data generation pipeline
-- [ ] 🚧 Pytorch Lightening integration
+- [ ] Pytorch Lightening integration
 - [ ] Reinforcement learning training infrastructure for recommendation task
 
 GPU
