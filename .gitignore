@@ -175,3 +175,4 @@ cython_debug/
 
 # Artifacts
 /artifacts
+/trace_logs
