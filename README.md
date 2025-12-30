@@ -27,11 +27,23 @@ This is a playground to re-implement model architectures from industry/academic 
 
 ### How to run locally
 
-1. install the dependency `pip install -r requirements.txt`, `pip install -e .`
-2. run `python main.py` to train the model with current env config.
-3. run `python -m server/ebr_server.py` to start the grpc server for embedding based retrieval, it would listen on port 50051 by default; if you use DuckDB then this step could be skipped
-4. run `python server/inference_engine.py` to start the inference server, it would listen on 8000 port
-5. run `bash scripts/server_request.sh` to send a dummy request (there is one for DIN and one for TransAct as of now, will parameterized the request in the future)
+#### Using uv (Recommended)
+
+1. Install [uv](https://github.com/astral-sh/uv) if you haven't already: `curl -LsSf https://astral.sh/uv/install.sh | sh`
+2. Install dependencies and the package: `uv sync` (this creates a virtual environment and installs everything)
+3. Activate the virtual environment: `source .venv/bin/activate` (or `uv shell` on some systems)
+4. Run `python main.py` to train the model with current env config.
+5. Run `python -m server/ebr_server.py` to start the grpc server for embedding based retrieval, it would listen on port 50051 by default; if you use DuckDB then this step could be skipped
+6. Run `python server/inference_engine.py` to start the inference server, it would listen on 8000 port
+7. Run `bash scripts/server_request.sh` to send a dummy request (there is one for DIN and one for TransAct as of now, will parameterized the request in the future)
+
+#### Using pip (Legacy)
+
+1. Install the dependency `pip install -r requirements.txt`, `pip install -e .`
+2. Run `python main.py` to train the model with current env config.
+3. Run `python -m server/ebr_server.py` to start the grpc server for embedding based retrieval, it would listen on port 50051 by default; if you use DuckDB then this step could be skipped
+4. Run `python server/inference_engine.py` to start the inference server, it would listen on 8000 port
+5. Run `bash scripts/server_request.sh` to send a dummy request (there is one for DIN and one for TransAct as of now, will parameterized the request in the future)
 
 ### Papers
 

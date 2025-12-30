@@ -1,3 +1,33 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "argo"
+version = "0.1"
+description = "Playground to re-implement model architectures from industry/academic papers in Pytorch"
+requires-python = ">=3.12"
+dependencies = [
+    "duckdb",
+    "faiss-cpu",
+    "fastapi",
+    "grpcio",
+    "grpcio-tools",
+    "jsonlines",
+    "k-means-constrained",
+    "pandas",
+    "pyarrow",
+    "python-dotenv",
+    "ray",
+    "requests",
+    "scikit-learn",
+    "themoviedb[full]",
+    "torch",
+    "transformers",
+    "uvicorn",
+    "datasets",
+]
+
 [tool.black]
 line-length = 180
 target-version = ['py312']
